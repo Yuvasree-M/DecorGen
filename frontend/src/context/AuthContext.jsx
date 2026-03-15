@@ -44,10 +44,9 @@ export const AuthProvider = ({ children }) => {
     const cred = await createUserWithEmailAndPassword(auth, email, pw);
     if (name) await updateProfile(cred.user, { displayName: name });
     const token = await cred.user.getIdToken();
-    await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/register`, {
-      method:  "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body:    JSON.stringify({ name, phone }),
+    await apiFetch("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ name, phone })
     });
     await signOut(auth); 
     return cred;
