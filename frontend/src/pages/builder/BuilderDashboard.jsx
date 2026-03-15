@@ -40,22 +40,43 @@ function InquiryChat({ inq, onReload }) {
   return (
     <div className="mt-4 border-t border-gray-100 pt-4 space-y-3">
       {/* Both design images */}
-      {(inq.originalImageUrl || inq.generatedImageUrl) && (
-        <div className="flex gap-2">
-          {inq.originalImageUrl && (
-            <div className="flex-1">
-              <p className="text-xs text-gray-400 mb-1 text-center">Original Room</p>
-              <Img src={inq.originalImageUrl} alt="Before" cls="w-full h-24 object-cover rounded-xl border border-gray-200"/>
-            </div>
-          )}
-          {inq.generatedImageUrl && (
-            <div className="flex-1">
-              <p className="text-xs text-purple-600 font-semibold mb-1 text-center">AI Design</p>
-              <Img src={inq.generatedImageUrl} alt="AI Design" cls="w-full h-24 object-cover rounded-xl border-2 border-purple-300"/>
-            </div>
-          )}
+{(inq.originalImageUrl || inq.generatedImageUrl) && (
+  <div className="flex gap-2">
+    
+    {inq.originalImageUrl && (
+      <div className="flex-1">
+        <p className="text-xs text-gray-400 mb-1 text-center">Original Room</p>
+
+        <div className="aspect-square w-full flex items-center justify-center rounded-xl border border-gray-200 bg-gray-50">
+          <Img
+            src={inq.originalImageUrl}
+            alt="Before"
+            cls="w-full h-full object-contain"
+          />
         </div>
-      )}
+
+      </div>
+    )}
+
+    {inq.generatedImageUrl && (
+      <div className="flex-1">
+        <p className="text-xs text-purple-600 font-semibold mb-1 text-center">
+          AI Design
+        </p>
+
+        <div className="aspect-square w-full flex items-center justify-center rounded-xl border-2 border-purple-300 bg-gray-50">
+          <Img
+            src={inq.generatedImageUrl}
+            alt="AI Design"
+            cls="w-full h-full object-contain"
+          />
+        </div>
+
+      </div>
+    )}
+
+  </div>
+)}
 
       {/* Messages */}
       <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
