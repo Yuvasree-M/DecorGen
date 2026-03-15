@@ -10,10 +10,10 @@ export const register = async (req, res) => {
     const existing = await userRef.get();
 
     if (existing.exists) {
-      return res.json({ message: "User already exists", ...existing.data() });
+      return res.json({ message: "User already exists" });
     }
 
-    const userData = {
+    const newUser = {
       name: name || "",
       email,
       phone: phone || "",
@@ -21,15 +21,29 @@ export const register = async (req, res) => {
       createdAt: new Date()
     };
 
-    await userRef.set(userData);
+    await userRef.set(newUser);
 
-    res.status(201).json({
-      id: uid,
-      ...userData
-    });
+    res.status(201).json({ id: uid, ...newUser });
 
   } catch (err) {
     console.error("register error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// GET /api/auth/me
+export const getMe = async (req, res) => {
+  try {
+    const snap = await db.collection("users").doc(req.user.uid).get();
+
+    if (!snap.exists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ id: snap.id, ...snap.data() });
+
+  } catch (err) {
+    console.error("getMe error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
