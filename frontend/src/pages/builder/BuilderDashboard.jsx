@@ -308,7 +308,7 @@ export default function BuilderDashboard() {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-violet-700 flex items-center justify-center shadow-sm shadow-purple-200">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2L22 8.5V15.5L12 22L2 15.5V8.5L12 2Z" stroke="white" strokeWidth="2"/><circle cx="12" cy="12" r="3" fill="white"/></svg>
             </div>
-            <span className="font-extrabold text-gray-900 text-sm">Interior<span className="text-purple-600">AI</span></span>
+            <span className="font-extrabold text-gray-900 text-sm">Decor<span className="text-purple-600">Gen</span></span>
           </a>
           <span className="text-gray-300">/</span>
           <span className="text-sm font-medium text-gray-500">Builder Dashboard</span>
@@ -401,7 +401,7 @@ export default function BuilderDashboard() {
                         </button>
                       )}
                       {inq.status!=="closed"&&<button onClick={()=>handleClose(inq.id)} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-xl font-medium transition">Close</button>}
-                      {inq.userEmail&&<a href={`mailto:${inq.userEmail}`} className="text-xs border border-gray-200 hover:border-purple-300 text-gray-500 hover:text-purple-600 px-3 py-1.5 rounded-xl font-medium transition">Email</a>}
+                      {/* {inq.userEmail&&<a href={`mailto:${inq.userEmail}`} className="text-xs border border-gray-200 hover:border-purple-300 text-gray-500 hover:text-purple-600 px-3 py-1.5 rounded-xl font-medium transition">Email</a>} */}
                     </div>
                     {openChat===inq.id && <InquiryChat inq={inq} onReload={load}/>}
                   </div>

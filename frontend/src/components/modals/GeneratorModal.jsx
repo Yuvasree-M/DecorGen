@@ -11,7 +11,6 @@ const STYLES = [
 ];
 const ROOMS = ["Living Room","Bedroom","Kitchen","Bathroom","Dining Room"];
 
-/* Download a URL as a File object (used to feed result back into enhance) */
 async function urlToFile(url, filename = "ai-design.jpg") {
   const res  = await fetch(url);
   const blob = await res.blob();

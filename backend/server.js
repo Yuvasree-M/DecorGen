@@ -21,7 +21,7 @@ app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/contact",   contactRoutes);
 app.use("/api/builders",  builderRoutes);
 
-app.get("/", (_, res) => res.json({ message: "InteriorAI API running ✅" }));
+app.get("/", (_, res) => res.json({ message: "DecorGen API running ✅" }));
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

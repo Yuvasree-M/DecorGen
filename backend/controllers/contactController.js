@@ -16,8 +16,8 @@ export const sendContact = async (req, res) => {
 
     // Email to admin
     await api.sendTransacEmail({
-      subject:     `New Contact: ${name} — InteriorAI`,
-      sender:      { name: "InteriorAI Contact", email: ADMIN },
+      subject:     `New Contact: ${name} — DecorGen`,
+      sender:      { name: "DecorGen Contact", email: ADMIN },
       to:          [{ email: ADMIN }],
       replyTo:     { email, name },
       htmlContent: `<div style="font-family:Arial,sans-serif;padding:30px;max-width:600px">
@@ -31,16 +31,16 @@ export const sendContact = async (req, res) => {
 
     // Auto-reply to user
     await api.sendTransacEmail({
-      subject:     "Thanks for contacting InteriorAI",
-      sender:      { name: "InteriorAI Support", email: ADMIN },
+      subject:     "Thanks for contacting DecorGen!",
+      sender:      { name: "DecorGen Support", email: ADMIN },
       to:          [{ email, name }],
       htmlContent: `<div style="font-family:Arial,sans-serif;padding:30px;max-width:600px">
         <h2 style="color:#7c3aed">Hello ${name}! 👋</h2>
-        <p>Thank you for contacting <b>InteriorAI</b>. We've received your message and will get back to you within 24 hours.</p>
+        <p>Thank you for contacting <b>DecorGen</b>. We've received your message and will get back to you within 24 hours.</p>
         <div style="background:#f5f3ff;padding:16px;border-radius:8px;margin:16px 0">
           <b>Your message:</b><br><br>${message.replace(/\n/g,"<br>")}
         </div>
-        <p>Best regards,<br><b>InteriorAI Team</b></p>
+        <p>Best regards,<br><b>DecorGen Team</b></p>
       </div>`,
     });
 

@@ -41,7 +41,7 @@ export default function Contact() {
           </p>
           <div className="space-y-5">
             {[
-              [FaEnvelope,     "Email",    "support@interiorai.in"],
+              [FaEnvelope,     "Email",    "support@decorgen.in"],
               [FaMapMarkerAlt, "Location", "Tamil Nadu, India"],
               [FaClock,        "Response", "Within 24 hours"],
             ].map(([Icon, label, val]) => (

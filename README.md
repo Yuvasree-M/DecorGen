@@ -1,4 +1,4 @@
-# InteriorAI — AI Interior Design Application
+# DecorGen — AI Interior Design Application
 
 Full-stack application: React + Vite frontend, Node.js + Express backend, Firebase Auth + Firestore, Cloudinary, Freepik AI.
 
