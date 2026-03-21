@@ -266,7 +266,7 @@ const data = await apiUpload(
                   <div className="bg-purple-50 border border-purple-200 rounded-xl p-3 mb-3 flex items-start gap-2">
                     <span className="text-purple-500 text-base shrink-0">🔧</span>
                     <p className="text-xs text-purple-700 leading-relaxed">
-                      <strong>AI-generated image loaded as input.</strong> Describe specific changes you want — lighting, furniture, colours, plants, textures — and the AI will refine this design further.
+                      Describe specific changes you want — lighting, furniture, colours, plants, textures — and the AI will refine this design further.
                     </p>
                   </div>
                 )}
@@ -274,7 +274,7 @@ const data = await apiUpload(
                   What to change?
                 </label>
                 <textarea value={enhanceInstr} onChange={e => setEnhanceInstr(e.target.value)} rows={4}
-                  placeholder="e.g. Add warmer lighting, replace the sofa with a velvet blue one, add indoor plants near the window, change wall colour to warm cream..."
+                  placeholder="e.g. Add warmer lighting, replace the sofa with a velvet blue one..."
                   className={`${inp} resize-none`}/>
                 <p className="text-xs text-gray-400 mt-1.5">
                   Tip: Be specific. "Change sofa to dark green velvet" works better than "change furniture".
@@ -292,7 +292,7 @@ const data = await apiUpload(
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
                   </svg>
-                  {tab === "generate" ? "Generating (20–40s)..." : "Enhancing (20–40s)..."}
+                  {tab === "generate" ? "Generating (10–20s)..." : "Enhancing (20–40s)..."}
                 </>
               ) : tab === "generate" ? " Generate AI Design" : " Apply Enhancement"}
             </button>
