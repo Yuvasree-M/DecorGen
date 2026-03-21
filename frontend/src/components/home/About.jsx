@@ -3,22 +3,16 @@ import { FaBrain, FaMagic, FaPalette, FaUserTie } from "react-icons/fa";
 
 const slides = [
   {
-    before:
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=900",
-    after:
-      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=900",
+    before: "/bedroom.jpg",
+    after: "/bedroom_new.jpeg",
   },
   {
-    before:
-      "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=900",
-    after:
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900",
+    before: "/oldroom.jpg",
+    after: "/living_room.jpeg",
   },
   {
-    before:
-      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=900",
-    after:
-      "https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=900",
+    before: "/kitchen.jpg",
+    after: "/new_kitchen.jpeg",
   },
 ];
 

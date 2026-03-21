@@ -21,16 +21,16 @@ export default function GeneratorModal({ onClose }) {
   const { isLoggedIn } = useAuth();
 
   const [tab,          setTab]          = useState("generate");
-  const [image,        setImage]        = useState(null);   // File object
-  const [preview,      setPreview]      = useState(null);   // object URL for display
+  const [image,        setImage]        = useState(null);   
+  const [preview,      setPreview]      = useState(null);  
   const [style,        setStyle]        = useState("");
   const [roomType,     setRoomType]     = useState("");
   const [customMode,   setCustomMode]   = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
   const [enhanceInstr, setEnhanceInstr] = useState("");
   const [loading,      setLoading]      = useState(false);
-  const [result,       setResult]       = useState(null);   // generated/enhanced image URL
-  const [originalUrl,  setOriginalUrl]  = useState(null);   // the "before" URL
+  const [result,       setResult]       = useState(null);   
+  const [originalUrl,  setOriginalUrl]  = useState(null);   
   const [sliderPos,    setSliderPos]    = useState(50);
   const [showBuilder,  setShowBuilder]  = useState(false);
   const [guestLeft,    setGuestLeft]    = useState(null);
@@ -45,7 +45,7 @@ export default function GeneratorModal({ onClose }) {
     setResult(null);
   };
 
-  /* When switching to Enhance tab: if a result exists, auto-load it as the new image */
+
   const switchToEnhance = async () => {
     setTab("enhance");
     if (result) {
@@ -53,12 +53,12 @@ export default function GeneratorModal({ onClose }) {
       try {
         const file = await urlToFile(result);
         setImage(file);
-        setPreview(result);    // show the AI image as the current "input" preview
-        setResult(null);       // clear old result so slider resets
+        setPreview(result);   
+        setResult(null);       
         setOriginalUrl(null);
         toast.info("🔧 AI design loaded as input — add your enhancement instructions below.");
       } catch {
-        // Fallback: just switch tab, user can upload manually
+
         toast.info("Switch to Enhance tab — upload an image or re-use your generated design.");
       } finally {
         setLoadingEnhanceSwitch(false);
@@ -66,10 +66,8 @@ export default function GeneratorModal({ onClose }) {
     }
   };
 
-  /* "Enhance This" button from result section — one click to switch + load */
   const handleEnhanceThis = async () => {
     await switchToEnhance();
-    // Scroll to instructions
     setTimeout(() => {
       document.getElementById("enhance-instructions")?.scrollIntoView({ behavior: "smooth" });
     }, 200);
@@ -97,7 +95,7 @@ const data = await apiUpload(
       setOriginalUrl(data.originalImage);
       setSliderPos(50);
       if (data.remaining !== null) setGuestLeft(data.remaining);
-      toast.success("✨ Design generated!");
+      toast.success(" Design generated!");
     } catch (err) {
       if (err.data?.requireLogin) toast.error("Guest limit reached. Sign in for unlimited designs.");
       else toast.error(err.message || "Generation failed");
@@ -123,7 +121,7 @@ const data = await apiUpload(
       setOriginalUrl(data.originalImage);
       setSliderPos(50);
       if (data.remaining !== null) setGuestLeft(data.remaining);
-      toast.success("🔧 Image enhanced!");
+      toast.success(" Image enhanced!");
     } catch (err) {
       if (err.data?.requireLogin) toast.error("Guest limit reached. Sign in to continue.");
       else toast.error(err.message || "Enhancement failed");
@@ -145,7 +143,6 @@ const data = await apiUpload(
 
         <div className="relative bg-white border border-gray-200 rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-y-auto animate-scaleIn">
 
-          {/* ── Header ── */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-7 py-5 flex items-center justify-between z-10 rounded-t-3xl">
             <div>
               <h2 className="text-xl font-bold text-gray-900">AI Room Designer</h2>
@@ -154,18 +151,18 @@ const data = await apiUpload(
               )}
             </div>
             <div className="flex items-center gap-3">
-              {/* Tab switcher */}
+
               <div className="flex bg-gray-100 rounded-xl p-1 text-xs font-semibold">
                 <button
                   onClick={() => { setTab("generate"); }}
                   className={`px-3 py-1.5 rounded-lg transition ${tab === "generate" ? "bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow" : "text-gray-500 hover:text-gray-800"}`}>
-                  ✨ Generate
+                  Generate
                 </button>
                 <button
                   onClick={switchToEnhance}
                   disabled={loadingEnhanceSwitch}
                   className={`px-3 py-1.5 rounded-lg transition ${tab === "enhance" ? "bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow" : "text-gray-500 hover:text-gray-800"} disabled:opacity-50`}>
-                  {loadingEnhanceSwitch ? "Loading..." : "🔧 Enhance"}
+                  {loadingEnhanceSwitch ? "Loading..." : " Enhance"}
                 </button>
               </div>
               <button onClick={onClose}
@@ -177,7 +174,6 @@ const data = await apiUpload(
 
           <div className="px-7 py-6 space-y-5">
 
-            {/* ── Upload zone ── */}
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                 {tab === "enhance" && image && preview === result?.toString()
@@ -206,9 +202,8 @@ const data = await apiUpload(
                   </div>
                 ) : (
                   <div className="py-4">
-                    <div className="text-4xl mb-2">📸</div>
                     <p className="text-sm font-medium text-gray-700">Drop room photo here or click to upload</p>
-                    <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5 MB</p>
+                    <p className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG up to 5 MB</p>
                   </div>
                 )}
               </div>
@@ -221,7 +216,6 @@ const data = await apiUpload(
               )}
             </div>
 
-            {/* ── Generate options ── */}
             {tab === "generate" && (
               <>
                 <div>
@@ -255,7 +249,7 @@ const data = await apiUpload(
                     className={`mt-3 w-full py-2.5 rounded-xl border-2 text-sm font-semibold transition ${
                       customMode ? "border-purple-500 bg-purple-50 text-purple-700" : "border-gray-200 text-gray-500 hover:border-purple-300"
                     }`}>
-                    ✏️ Custom Instructions {customMode ? "(Active)" : ""}
+                     Custom Instructions {customMode ? "(Active)" : ""}
                   </button>
                   {customMode && (
                     <textarea value={customPrompt} onChange={e => setCustomPrompt(e.target.value)} rows={3}
@@ -266,10 +260,8 @@ const data = await apiUpload(
               </>
             )}
 
-            {/* ── Enhance options ── */}
             {tab === "enhance" && (
               <div id="enhance-instructions">
-                {/* Info banner when AI image is loaded */}
                 {image && (
                   <div className="bg-purple-50 border border-purple-200 rounded-xl p-3 mb-3 flex items-start gap-2">
                     <span className="text-purple-500 text-base shrink-0">🔧</span>
@@ -290,7 +282,6 @@ const data = await apiUpload(
               </div>
             )}
 
-            {/* ── Action button ── */}
             <button
               onClick={tab === "generate" ? handleGenerate : handleEnhance}
               disabled={loading || !image || loadingEnhanceSwitch}
@@ -303,20 +294,18 @@ const data = await apiUpload(
                   </svg>
                   {tab === "generate" ? "Generating (20–40s)..." : "Enhancing (20–40s)..."}
                 </>
-              ) : tab === "generate" ? "✨ Generate AI Design" : "🔧 Apply Enhancement"}
+              ) : tab === "generate" ? " Generate AI Design" : " Apply Enhancement"}
             </button>
 
-            {/* ── Result section ── */}
             {result && (
               <div className="border-t border-gray-200 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-gray-900">
-                  {tab === "generate" ? "✨ Your AI Design" : "🔧 Enhanced Result"}
+                  {tab === "generate" ? " Your AI Design" : " Enhanced Result"}
                 </h3>
 
-                {/* Before / After slider */}
                 {originalUrl && (
                   <div>
-                    <p className="text-xs text-gray-400 mb-2">👆 Drag slider to compare before &amp; after</p>
+                    <p className="text-xs text-gray-400 mb-2"> Drag slider to compare before &amp; after</p>
                     <div className="relative rounded-2xl overflow-hidden select-none border border-gray-200"
                       style={{ aspectRatio: "4/3" }}>
                       <img src={result} alt="After" className="absolute inset-0 w-full h-full object-cover"/>
@@ -350,7 +339,7 @@ const data = await apiUpload(
                   </button>
                   <button onClick={() => setShowBuilder(true)}
                     className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-violet-600 text-white py-3 rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-md shadow-purple-200">
-                    🤝 Connect with Designer
+                     Connect with Designer
                   </button>
                 </div>
 
@@ -377,7 +366,7 @@ const data = await apiUpload(
                   onClick={tab === "generate" ? handleGenerate : handleEnhance}
                   disabled={loading}
                   className="w-full py-2.5 border border-gray-300 text-gray-500 hover:text-purple-600 hover:border-purple-300 rounded-xl text-sm font-medium transition disabled:opacity-40">
-                  🔄 Regenerate
+                   Regenerate
                 </button>
               </div>
             )}
