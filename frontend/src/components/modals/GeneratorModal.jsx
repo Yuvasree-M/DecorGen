@@ -3,7 +3,7 @@ import { useAuth }                      from "../../context/AuthContext";
 import { apiUpload }                    from "../../services/api";
 import { toast }                        from "react-toastify";
 import BuilderModal                     from "../BuilderModal";
-
+import { getGuestId } from "../../utils/guest";
 const STYLES = [
   { value:"modern",      label:"Modern",      emoji:"🏙️" },
   { value:"traditional", label:"Traditional", emoji:"🏛️" },
@@ -85,7 +85,17 @@ export default function GeneratorModal({ onClose }) {
       fd.append("style",        style || "");
       fd.append("roomType",     roomType || "");
       fd.append("customPrompt", customMode ? customPrompt : "");
-      const data = await apiUpload("/api/designs/generate", fd);
+     const guestId = getGuestId();
+
+const data = await apiUpload(
+  "/api/designs/generate",
+  fd,
+  {
+    headers: {
+      "x-guest-id": guestId
+    }
+  }
+);
       setResult(data.generatedImage);
       setOriginalUrl(data.originalImage);
       setSliderPos(50);
@@ -104,7 +114,17 @@ export default function GeneratorModal({ onClose }) {
       const fd = new FormData();
       fd.append("image",        image);
       fd.append("instructions", enhanceInstr || "");
-      const data = await apiUpload("/api/designs/enhance", fd);
+     const guestId = getGuestId();
+
+const data = await apiUpload(
+  "/api/designs/enhance",
+  fd,
+  {
+    headers: {
+      "x-guest-id": guestId
+    }
+  }
+);
       setResult(data.enhancedImage);
       setOriginalUrl(data.originalImage);
       setSliderPos(50);

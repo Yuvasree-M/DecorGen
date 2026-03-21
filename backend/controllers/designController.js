@@ -17,14 +17,26 @@ export const generateDesign = async (req, res) => {
     const file                              = req.file;
     const { style, customPrompt, roomType } = req.body;
     const isGuest                           = !req.user;
+
     if (!file) return res.status(400).json({ message: "Image required" });
 
+    const identity = {
+      userId: req.user?.uid,
+      guestId: req.headers["x-guest-id"],
+      ip: req.ip || "unknown",
+    };
+
     if (isGuest) {
-      const ip    = req.ip || "unknown";
-      const check = checkGuestLimit(ip, "generate");
-      if (!check.allowed)
-        return res.status(403).json({ message: `Free limit reached (${check.limit}). Please sign in.`, requireLogin: true });
-      incrementGuestUsage(ip, "generate");
+      const check = checkGuestLimit(identity, "generate");
+
+      if (!check.allowed) {
+        return res.status(403).json({
+          message: `Free limit reached (${check.limit}). Please sign in.`,
+          requireLogin: true
+        });
+      }
+
+      incrementGuestUsage(identity, "generate");
     }
 
     const uploaded    = await uploadToCloudinary(file.buffer);
@@ -34,15 +46,29 @@ export const generateDesign = async (req, res) => {
 
     if (req.user) {
       await db.collection("designs").add({
-        userId: req.user.uid, originalImageUrl: imageUrl, generatedImageUrl: outputImage,
-        style: style || "", roomType: roomType || "", customPrompt: customPrompt || "",
-        type: "generate", createdAt: new Date(),
+        userId: req.user.uid,
+        originalImageUrl: imageUrl,
+        generatedImageUrl: outputImage,
+        style: style || "",
+        roomType: roomType || "",
+        customPrompt: customPrompt || "",
+        type: "generate",
+        createdAt: new Date(),
       });
     }
 
-    const ip        = req.ip || "unknown";
-    const remaining = isGuest ? checkGuestLimit(ip, "generate").remaining : null;
-    res.json({ success: true, originalImage: imageUrl, generatedImage: outputImage, isGuest, remaining });
+    const remaining = isGuest
+      ? checkGuestLimit(identity, "generate").remaining
+      : null;
+
+    res.json({
+      success: true,
+      originalImage: imageUrl,
+      generatedImage: outputImage,
+      isGuest,
+      remaining
+    });
+
   } catch (err) {
     console.error("generateDesign error:", err.message);
     res.status(500).json({ message: "AI generation failed" });
@@ -58,11 +84,15 @@ export const enhanceDesign = async (req, res) => {
     if (!file) return res.status(400).json({ message: "Image required" });
 
     if (isGuest) {
-      const ip    = req.ip || "unknown";
-      const check = checkGuestLimit(ip, "enhance");
+      const identity = {
+  userId: req.user?.uid,
+  guestId: req.headers["x-guest-id"],
+  ip: req.ip || "unknown",
+};
+      const check = checkGuestLimit(identity, "enhance");
       if (!check.allowed)
         return res.status(403).json({ message: `Free limit reached (${check.limit}). Please sign in.`, requireLogin: true });
-      incrementGuestUsage(ip, "enhance");
+      incrementGuestUsage(identity, "enhance");
     }
 
     const uploaded    = await uploadToCloudinary(file.buffer);
@@ -76,9 +106,12 @@ export const enhanceDesign = async (req, res) => {
         enhanceInstructions: instructions || "", type: "enhance", createdAt: new Date(),
       });
     }
-
-    const ip        = req.ip || "unknown";
-    const remaining = isGuest ? checkGuestLimit(ip, "enhance").remaining : null;
+const identity = {
+  userId: req.user?.uid,
+  guestId: req.headers["x-guest-id"],
+  ip: req.ip || "unknown",
+};
+    const remaining = isGuest ? checkGuestLimit(identity, "enhance").remaining : null;
     res.json({ success: true, originalImage: imageUrl, enhancedImage: outputImage, isGuest, remaining });
   } catch (err) {
     console.error("enhanceDesign error:", err.message);
