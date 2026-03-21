@@ -384,22 +384,19 @@
 //       )}
 //     </>
 //   );
-// }
-import { useState, useRef } from "react";
+// }import { useState, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { apiUpload } from "../../services/api";
 import { toast } from "react-toastify";
 import BuilderModal from "../BuilderModal";
 import { getGuestId } from "../../utils/guest";
 
-// ── React Icons ───────────────────────────────────────────────────────────────
-import { LuUpload, LuImage, LuWand2, LuRefreshCw, LuLink } from "react-icons/lu";
-import { HiOutlineX }            from "react-icons/hi";
-import { HiArrowDownTray }       from "react-icons/hi2";
-import { MdOutlineLock }         from "react-icons/md";
-import { RiUserLine, RiSparklingLine } from "react-icons/ri";
-import { TbArrowsHorizontal }    from "react-icons/tb";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+// ── React Icons (Font Awesome) ────────────────────────────────────────────────
+import {
+  FaUpload, FaImage, FaMagic, FaSyncAlt, FaLink,
+  FaTimes, FaDownload, FaLock, FaUser, FaStar,
+  FaArrowsAltH, FaSpinner, FaWrench,
+} from "react-icons/fa";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const STYLES = [
@@ -422,7 +419,7 @@ function GuestLimitPopup({ onClose, onSignIn, onSignUp }) {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}/>
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-8 text-center animate-scaleIn">
         <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-4 text-violet-600">
-          <MdOutlineLock size={32} />
+          <FaLock size={28} />
         </div>
         <h3 className="text-xl font-bold text-gray-900 mb-2">Free limit reached</h3>
         <p className="text-sm text-gray-500 mb-6 leading-relaxed">
@@ -432,7 +429,7 @@ function GuestLimitPopup({ onClose, onSignIn, onSignUp }) {
           <button
             onClick={onSignIn}
             className="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-semibold text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
-            <RiUserLine size={17} /> Sign In
+            <FaUser size={14} /> Sign In
           </button>
           <button
             onClick={onSignUp}
@@ -467,7 +464,7 @@ function DownloadPicker({ url, onClose }) {
       {formats.map(f => (
         <button key={f} onClick={() => download(f)}
           className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-700 transition flex items-center gap-2">
-          <HiArrowDownTray size={15} /> .{f.toUpperCase()}
+          <FaDownload size={13} /> .{f.toUpperCase()}
         </button>
       ))}
     </div>
@@ -586,7 +583,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-700 rounded-lg flex items-center justify-center text-white">
-                <LuWand2 size={15} />
+                <FaMagic size={14} />
               </div>
               <div>
                 <h2 className="text-base font-bold text-gray-900 leading-none">AI Room Designer</h2>
@@ -608,13 +605,13 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                   onClick={switchToEnhance}
                   disabled={loadingSwitch}
                   className={`px-4 py-1.5 rounded-md transition-all flex items-center gap-1 ${tab === "enhance" ? "bg-white text-violet-700 shadow-sm" : "text-gray-500 hover:text-gray-700"} disabled:opacity-50`}>
-                  {loadingSwitch ? <AiOutlineLoading3Quarters size={13} className="animate-spin" /> : <LuWand2 size={13} />}
+                  {loadingSwitch ? <FaSpinner size={13} className="animate-spin" /> : <FaWrench size={13} />}
                   Enhance
                 </button>
               </div>
               <button onClick={onClose}
                 className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-red-50 hover:text-red-500 flex items-center justify-center text-gray-400 transition">
-                <HiOutlineX size={15} />
+                <FaTimes size={13} />
               </button>
             </div>
           </div>
@@ -657,7 +654,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                     </div>
                   ) : (
                     <div className="py-10 flex flex-col items-center gap-3 text-gray-400">
-                      <LuUpload size={38} strokeWidth={1.2} />
+                      <FaUpload size={30} />
                       <div className="text-center">
                         <p className="text-sm font-medium text-gray-600">Drop photo here or click to upload</p>
                         <p className="text-xs text-gray-400 mt-0.5">PNG, JPG, JPEG — up to 5 MB</p>
@@ -668,7 +665,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                 {preview && (
                   <button onClick={clearImage}
                     className="mt-1.5 text-[11px] text-gray-400 hover:text-red-400 transition flex items-center gap-1">
-                    <HiOutlineX size={11} /> Remove image
+                    <FaTimes size={10} /> Remove image
                   </button>
                 )}
               </div>
@@ -706,7 +703,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                       className={`mt-2 w-full py-2.5 rounded-xl border-2 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
                         customMode ? "border-violet-500 bg-violet-50 text-violet-700" : "border-gray-200 text-gray-500 hover:border-violet-300"
                       }`}>
-                      <LuWand2 size={13} /> Custom Prompt {customMode ? "(Active)" : ""}
+                      <FaMagic size={12} /> Custom Prompt {customMode ? "(Active)" : ""}
                     </button>
                     {customMode && (
                       <textarea value={customPrompt} onChange={e => setCustomPrompt(e.target.value)} rows={3}
@@ -722,7 +719,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                 <div>
                   {image && (
                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3 flex items-start gap-2">
-                      <LuWand2 size={15} className="text-amber-500 mt-0.5 shrink-0" />
+                      <FaWrench size={13} className="text-amber-500 mt-0.5 shrink-0" />
                       <p className="text-xs text-amber-700 leading-relaxed">
                         Describe specific changes — lighting, furniture, colours, textures — and the AI will refine this design.
                       </p>
@@ -747,13 +744,13 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                 className="w-full py-3.5 bg-gradient-to-r from-violet-600 to-purple-700 text-white rounded-xl font-bold text-sm hover:opacity-90 transition shadow-lg shadow-violet-200/60 disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading ? (
                   <>
-                    <AiOutlineLoading3Quarters size={16} className="animate-spin" />
+                    <FaSpinner size={15} className="animate-spin" />
                     {tab === "generate" ? "Generating (10–20s)..." : "Enhancing (20–40s)..."}
                   </>
                 ) : tab === "generate" ? (
-                  <><RiSparklingLine size={16} /> Generate AI Design</>
+                  <><FaStar size={14} /> Generate AI Design</>
                 ) : (
-                  <><LuWand2 size={15} /> Apply Enhancement</>
+                  <><FaMagic size={13} /> Apply Enhancement</>
                 )}
               </button>
             </div>
@@ -767,7 +764,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                       {tab === "generate" ? "Your AI Design" : "Enhanced Result"}
                     </h3>
                     <span className="text-[10px] bg-green-100 text-green-700 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <RiSparklingLine size={11} /> Ready
+                      <FaStar size={10} /> Ready
                     </span>
                   </div>
 
@@ -783,7 +780,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                       {/* Divider */}
                       <div className="absolute top-0 bottom-0 w-0.5 bg-white/90 shadow-md" style={{ left: `${sliderPos}%` }}>
                         <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center cursor-ew-resize">
-                          <TbArrowsHorizontal size={18} className="text-violet-600" />
+                          <FaArrowsAltH size={16} className="text-violet-600" />
                         </div>
                       </div>
                       <span className="absolute top-2.5 left-2.5 bg-black/50 text-white text-[10px] px-2 py-0.5 rounded-md font-semibold">Before</span>
@@ -806,7 +803,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                       <button
                         onClick={() => setShowDownloadPicker(p => !p)}
                         className="w-full flex items-center justify-center gap-2 bg-white border border-gray-200 hover:border-violet-300 hover:bg-violet-50 text-gray-700 hover:text-violet-700 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm">
-                        <HiArrowDownTray size={15} /> Download
+                        <FaDownload size={13} /> Download
                       </button>
                       {showDownloadPicker && (
                         <DownloadPicker url={result} onClose={() => setShowDownloadPicker(false)}/>
