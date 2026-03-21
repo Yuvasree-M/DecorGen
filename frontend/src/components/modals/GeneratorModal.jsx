@@ -813,18 +813,18 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
 
                     <button onClick={() => setShowBuilder(true)}
                       className="flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-700 text-white py-2.5 rounded-xl text-xs font-semibold hover:opacity-90 transition shadow-md shadow-violet-200">
-                      <LuLink size={14} /> Connect Designer
+                      <FaLink size={13} /> Connect Designer
                     </button>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2.5">
                     <button onClick={switchToEnhance} disabled={loadingSwitch}
                       className="flex items-center justify-center gap-1.5 py-2.5 bg-amber-50 border border-amber-200 hover:border-amber-400 text-amber-700 rounded-xl text-xs font-semibold transition disabled:opacity-50">
-                      {loadingSwitch ? <AiOutlineLoading3Quarters size={13} className="animate-spin" /> : <LuWand2 size={13} />} Enhance Further
+                      {loadingSwitch ? <FaSpinner size={13} className="animate-spin" /> : <FaWrench size={13} />} Enhance Further
                     </button>
                     <button onClick={tab === "generate" ? handleGenerate : handleEnhance} disabled={loading}
                       className="flex items-center justify-center gap-1.5 py-2.5 border border-gray-200 text-gray-500 hover:text-violet-600 hover:border-violet-300 rounded-xl text-xs font-semibold transition disabled:opacity-40">
-                      <LuRefreshCw size={13} /> Regenerate
+                      <FaSyncAlt size={12} /> Regenerate
                     </button>
                   </div>
                 </div>
@@ -832,7 +832,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                 /* Empty state */
                 <div className="flex-1 flex flex-col items-center justify-center p-10 text-center gap-4">
                   <div className="w-20 h-20 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300">
-                    <LuImage size={38} strokeWidth={1.2} />
+                    <FaImage size={34} />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-400">Your result will appear here</p>
@@ -840,7 +840,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                   </div>
                   {loading && (
                     <div className="flex items-center gap-2 text-violet-500 text-sm font-medium">
-                      <AiOutlineLoading3Quarters size={16} className="animate-spin" /> Working on your design...
+                      <FaSpinner size={15} className="animate-spin" /> Working on your design...
                     </div>
                   )}
                 </div>
