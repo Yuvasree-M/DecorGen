@@ -407,42 +407,32 @@ const STYLES = [
 ];
 const ROOMS = ["Living Room", "Bedroom", "Kitchen", "Bathroom", "Dining Room"];
 
-// Convert any URL → File (used to pass AI result into enhance as multipart)
-async function urlToFile(url, filename = "ai-design.jpg") {
-  const res  = await fetch(url);
+// ── Proxy helpers ─────────────────────────────────────────────────────────────
+// All fetches of AI-generated images go through /api/proxy-image so we avoid
+// CORS restrictions from the CDN (delivery.eu1.bfl.ai etc.)
+
+function proxyUrl(imageUrl) {
+  // Returns a same-origin URL that the browser can freely fetch/display
+  return `/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+}
+
+// Fetch the AI image via our proxy → return a File object for multipart upload
+async function proxyUrlToFile(imageUrl, filename = "ai-design.jpg") {
+  const res = await fetch(proxyUrl(imageUrl));
+  if (!res.ok) throw new Error(`Proxy fetch failed: ${res.status}`);
   const blob = await res.blob();
   return new File([blob], filename, { type: blob.type || "image/jpeg" });
 }
 
-// Canvas-based download — handles cross-origin URLs properly
-async function downloadImageAs(url, fmt) {
-  try {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    await new Promise((resolve, reject) => {
-      img.onload  = resolve;
-      img.onerror = reject;
-      img.src = url;
-    });
-    const canvas = document.createElement("canvas");
-    canvas.width  = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    canvas.getContext("2d").drawImage(img, 0, 0);
-    const mimeMap = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png" };
-    const blob = await new Promise(res => canvas.toBlob(res, mimeMap[fmt] || "image/png"));
-    const blobUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = blobUrl;
-    a.download = `decorgen-design.${fmt}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-  } catch {
-    // Fallback if canvas/CORS fails
-    window.open(url, "_blank");
-    toast.info("Right-click the image and choose Save As to download.");
-  }
+// Download via proxy — proxy sets Content-Disposition so browser saves the file
+function proxyDownload(imageUrl, fmt = "png") {
+  const url = `/api/proxy-image?url=${encodeURIComponent(imageUrl)}&download=1&fmt=${fmt}`;
+  const a = document.createElement("a");
+  a.href = a.download = url; // download attr triggers save dialog
+  a.download = `decorgen-design.${fmt}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 // ── Guest Limit Popup ─────────────────────────────────────────────────────────
@@ -459,13 +449,11 @@ function GuestLimitPopup({ onClose, onSignIn, onSignUp }) {
           You've used all your free generations. Sign in or create a free account to continue designing.
         </p>
         <div className="flex flex-col gap-3">
-          <button
-            onClick={onSignIn}
+          <button onClick={onSignIn}
             className="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-semibold text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
             <FaUser size={14} color="#fff" /> Sign In
           </button>
-          <button
-            onClick={onSignUp}
+          <button onClick={onSignUp}
             className="w-full py-3 border-2 border-violet-200 text-violet-700 rounded-xl font-semibold text-sm hover:bg-violet-50 transition">
             Create Free Account
           </button>
@@ -479,12 +467,13 @@ function GuestLimitPopup({ onClose, onSignIn, onSignUp }) {
 }
 
 // ── Download Format Picker ────────────────────────────────────────────────────
-function DownloadPicker({ url, onClose }) {
+function DownloadPicker({ imageUrl, onClose }) {
   const formats = ["png", "jpg", "jpeg"];
-  const handleDownload = async (fmt) => {
+  const handleDownload = (fmt) => {
     onClose();
-    toast.info(`Preparing .${fmt.toUpperCase()} download...`);
-    await downloadImageAs(url, fmt);
+    // Trigger via proxy — no CORS, correct Content-Disposition
+    proxyDownload(imageUrl, fmt);
+    toast.success(`.${fmt.toUpperCase()} download started!`);
   };
   return (
     <div className="absolute bottom-full mb-2 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-20">
@@ -504,16 +493,26 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
   const { isLoggedIn } = useAuth();
 
   const [tab,          setTab]          = useState("generate");
-  const [image,        setImage]        = useState(null);   // current file in upload zone
-  const [preview,      setPreview]      = useState(null);
+  const [image,        setImage]        = useState(null);   // File in upload zone
+  const [preview,      setPreview]      = useState(null);   // preview src (blob URL or proxy URL)
+
+  // Raw AI-result URL (from API response) — kept separate from preview/image
+  // so we can always proxy-fetch it without losing it
+  const resultUrlRef    = useRef(null);
+  // Original user upload — preserved for Regenerate
+  const originalFileRef = useRef(null);
+
   const [style,        setStyle]        = useState("");
   const [roomType,     setRoomType]     = useState("");
   const [customMode,   setCustomMode]   = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
   const [enhanceInstr, setEnhanceInstr] = useState("");
   const [loading,      setLoading]      = useState(false);
+
+  // result / originalUrl stored as-is (raw CDN URLs) — displayed via proxy <img>
   const [result,       setResult]       = useState(null);
   const [originalUrl,  setOriginalUrl]  = useState(null);
+
   const [sliderPos,    setSliderPos]    = useState(50);
   const [showBuilder,  setShowBuilder]  = useState(false);
   const [guestLeft,    setGuestLeft]    = useState(null);
@@ -521,47 +520,51 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
   const [showDownloadPicker, setShowDownloadPicker] = useState(false);
   const [showGuestPopup,     setShowGuestPopup]     = useState(false);
 
-  const inputRef      = useRef();
-  // Stores the user's original uploaded file so Regenerate always re-uses it
-  const originalFileRef = useRef(null);
+  const inputRef = useRef();
 
-  // Called only when the user manually picks a file
+  // User manually picks a file
   const handleFile = (file) => {
     if (!file) return;
-    originalFileRef.current = file;   // ← save for regenerate
+    originalFileRef.current = file;
     setImage(file);
     setPreview(URL.createObjectURL(file));
     setResult(null);
     setOriginalUrl(null);
+    resultUrlRef.current = null;
   };
 
   const clearImage = () => {
     originalFileRef.current = null;
+    resultUrlRef.current    = null;
     setImage(null); setPreview(null); setResult(null); setOriginalUrl(null);
   };
 
-  // Load AI result as input image for Enhance tab
+  // Load AI result as enhance input — fetch via proxy to avoid CORS
   const switchToEnhance = async () => {
     setTab("enhance");
-    if (result) {
-      setLoadingSwitch(true);
-      try {
-        // Convert AI result URL → File so it can be sent as multipart/form-data
-        const aiFile = await urlToFile(result);
-        setImage(aiFile);              // ← enhance will send THIS file
-        setPreview(result);            // show the AI result in upload zone
-        setResult(null);
-        setOriginalUrl(null);
-        toast.info("AI design loaded as input — describe your changes below.");
-      } catch {
-        toast.error("Failed to load AI design. Please re-upload manually.");
-      } finally {
-        setLoadingSwitch(false);
-      }
+    const rawResultUrl = resultUrlRef.current;
+    if (!rawResultUrl) return; // no result yet, just switch tab
+
+    setLoadingSwitch(true);
+    try {
+      // Proxy fetch → File so we can send it as multipart to /api/designs/enhance
+      const aiFile = await proxyUrlToFile(rawResultUrl);
+      setImage(aiFile);
+      // Show a proxied preview so browser can render it without CORS issues
+      setPreview(proxyUrl(rawResultUrl));
+      setResult(null);
+      setOriginalUrl(null);
+      resultUrlRef.current = null;
+      toast.info("AI design loaded as input — describe your changes below.");
+    } catch (err) {
+      console.error("switchToEnhance error:", err);
+      toast.error("Could not load AI design. Please upload the image manually.");
+    } finally {
+      setLoadingSwitch(false);
     }
   };
 
-  // ── Generate (accepts optional file override for regenerate) ──────────────
+  // ── Generate ──────────────────────────────────────────────────────────────
   const handleGenerate = useCallback(async (fileOverride) => {
     const fileToSend = fileOverride !== undefined ? fileOverride : image;
     if (!fileToSend) { toast.error("Please upload a room photo first"); return; }
@@ -575,6 +578,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
       fd.append("customPrompt", customMode ? customPrompt : "");
       fd.append("guestId",      getGuestId());
       const data = await apiUpload("/api/designs/generate", fd, "POST");
+      resultUrlRef.current = data.generatedImage; // raw CDN URL preserved
       setResult(data.generatedImage);
       setOriginalUrl(data.originalImage);
       setSliderPos(50);
@@ -586,17 +590,18 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
     } finally { setLoading(false); }
   }, [image, style, roomType, customMode, customPrompt]);
 
-  // ── Enhance (accepts optional file override for regenerate) ───────────────
+  // ── Enhance ───────────────────────────────────────────────────────────────
   const handleEnhance = useCallback(async (fileOverride) => {
     const fileToSend = fileOverride !== undefined ? fileOverride : image;
     if (!fileToSend) { toast.error("Please upload an image first"); return; }
     setLoading(true);
     try {
       const fd = new FormData();
-      fd.append("image",        fileToSend);  // ← AI result file when called from switchToEnhance
+      fd.append("image",        fileToSend); // AI result File (fetched via proxy)
       fd.append("instructions", enhanceInstr || "");
       fd.append("guestId",      getGuestId());
       const data = await apiUpload("/api/designs/enhance", fd, "POST");
+      resultUrlRef.current = data.enhancedImage;
       setResult(data.enhancedImage);
       setOriginalUrl(data.originalImage);
       setSliderPos(50);
@@ -608,7 +613,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
     } finally { setLoading(false); }
   }, [image, enhanceInstr]);
 
-  // ── Regenerate — re-uses original file for generate; current image for enhance
+  // ── Regenerate ────────────────────────────────────────────────────────────
   const handleRegenerate = () => {
     if (tab === "generate") {
       const file = originalFileRef.current || image;
@@ -817,13 +822,17 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                     </span>
                   </div>
 
-                  {/* Before / After slider */}
+                  {/* Before / After slider — both images served via proxy */}
                   {originalUrl && (
                     <div className="flex-1 relative rounded-xl overflow-hidden select-none border border-gray-200 shadow-sm min-h-[260px]"
                       style={{ aspectRatio: "4/3" }}>
-                      <img src={result} alt="After" className="absolute inset-0 w-full h-full object-cover"/>
+                      {/* After — proxied */}
+                      <img src={proxyUrl(result)} alt="After"
+                        className="absolute inset-0 w-full h-full object-cover"/>
+                      {/* Before — proxied */}
                       <div className="absolute inset-0 overflow-hidden" style={{ width: `${sliderPos}%` }}>
-                        <img src={originalUrl} alt="Before" className="absolute inset-0 h-full object-cover"
+                        <img src={proxyUrl(originalUrl)} alt="Before"
+                          className="absolute inset-0 h-full object-cover"
                           style={{ width: `${10000 / sliderPos}%`, maxWidth: "none" }}/>
                       </div>
                       <div className="absolute top-0 bottom-0 w-0.5 bg-white/90 shadow-md" style={{ left: `${sliderPos}%` }}>
@@ -853,7 +862,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                         <FaDownload size={13} color="#7c3aed" /> Download
                       </button>
                       {showDownloadPicker && (
-                        <DownloadPicker url={result} onClose={() => setShowDownloadPicker(false)}/>
+                        <DownloadPicker imageUrl={result} onClose={() => setShowDownloadPicker(false)}/>
                       )}
                     </div>
                     <button onClick={() => setShowBuilder(true)}
@@ -871,9 +880,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                         : <FaWrench  size={12} color="#d97706" />}
                       Enhance Further
                     </button>
-                    <button
-                      onClick={handleRegenerate}
-                      disabled={loading}
+                    <button onClick={handleRegenerate} disabled={loading}
                       className="flex items-center justify-center gap-1.5 py-2.5 border border-gray-200 text-gray-500 hover:text-violet-600 hover:border-violet-300 rounded-xl text-xs font-semibold transition disabled:opacity-40">
                       <FaSyncAlt size={12} color="#7c3aed" /> Regenerate
                     </button>
