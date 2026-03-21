@@ -1,56 +1,82 @@
 export const buildPrompt = ({ style, customPrompt, roomType }) => {
+  const baseRules = `
+IMPORTANT STRICT RULES:
+- Preserve the EXACT original room layout, architecture, wall positions, windows, doors, and camera perspective.
+- DO NOT alter room structure, proportions, or viewpoint.
+
+RESTORATION & CLEANUP (MANDATORY):
+- Completely REMOVE all damage: cracks, stains, peeling paint, dampness, scratches, dirt, dust, clutter, or imperfections.
+- Replace ALL damaged, old, broken, or worn-out furniture and decor with brand-new, pristine items.
+- Surfaces must appear clean, polished, and flawless.
+
+LIGHTING (VERY IMPORTANT):
+- Apply realistic, high-quality lighting that MATCHES the target style.
+- Ensure proper brightness, soft shadows, natural/global illumination, and depth.
+- Eliminate dull, flat, or poorly lit areas. The room should feel professionally lit.
+
+REALISM:
+- Use realistic materials (wood, marble, fabric, metal, glass).
+- Ensure proper reflections, shadows, depth, and spatial consistency.
+- Output should look like a high-end interior photoshoot.
+
+- Remove any watermark, logo, or text overlay if present.
+`;
+
   if (customPrompt?.trim()) {
     return `Interior redesign of the same ${roomType || "room"}.
 
-IMPORTANT RULES:
-- Preserve the exact original room layout, architecture, wall positions, windows, doors, and camera perspective.
-- Do NOT change room structure or dimensions.
-- If the input image contains any watermark, logo, or text overlay, remove it during the redesign.
+${baseRules}
 
-Redesign the interior from ceiling to floor including furniture, lighting, decor, flooring, wall colors, and ceiling design using this description:
-${customPrompt}.
+Redesign the entire interior (ceiling to floor) including furniture, lighting, decor, flooring, walls, and ceiling using this description:
+${customPrompt}
 
-Use realistic materials, natural lighting, soft shadows, reflections, and depth.
-
-Ultra-realistic interior design photography, high-end architectural visualization, 4k photorealistic render, magazine-quality interior photo.`;
+FINAL OUTPUT:
+Ultra-realistic interior design photography, high-end architectural visualization, perfectly clean and refined space, 4K photorealistic render, magazine-quality.`;
   }
 
   const styles = {
     modern: `Interior redesign of the same ${roomType || "room"}.
 
-IMPORTANT RULES:
-- Keep the exact same layout, architecture, windows, and camera angle.
-- Do NOT modify walls, room shape, or structure.
-- Remove watermark, logo, or text if present in the original image.
+${baseRules}
 
-Transform the interior completely into modern luxury style:
-minimalist furniture, sleek sofa, glass or marble coffee table, hidden LED ceiling lighting, neutral wall colors, wooden or marble flooring, modern decor.
+STYLE TRANSFORMATION: MODERN LUXURY
+- Minimalist, clutter-free design
+- Sleek premium furniture
+- Glass, marble, or metal finishes
+- Neutral color palette (white, beige, grey, black)
+- Hidden LED ceiling lighting, ambient strip lighting
+- Clean lines and sophisticated decor
 
-Photorealistic interior design photography, architectural visualization, natural lighting, realistic shadows, ultra-detailed 4k render.`,
+FINAL OUTPUT:
+Bright, well-lit modern luxury interior, ultra-realistic, soft shadows, premium materials, 4K architectural render.`,
 
     traditional: `Interior redesign of the same ${roomType || "room"}.
 
-IMPORTANT RULES:
-- Maintain the exact original layout, walls, windows, and camera perspective.
-- Do not change room structure.
-- Remove watermark or text if present.
+${baseRules}
 
-Redesign the interior in classic traditional style:
-rich wooden furniture, carved tables, elegant lamps, chandeliers, warm wall tones, decorative curtains, patterned rugs.
+STYLE TRANSFORMATION: CLASSIC TRADITIONAL
+- Rich wooden furniture with fine craftsmanship
+- Ornate details, carved elements
+- Chandeliers, warm ambient lighting
+- Warm wall tones (cream, gold, brown)
+- Elegant curtains, rugs, and classic decor
 
-Ultra-realistic traditional interior photography, cinematic lighting, realistic materials, 4k architectural render.`,
+FINAL OUTPUT:
+Warm, inviting traditional interior, cinematic lighting, rich textures, ultra-realistic 4K render.`,
 
     aesthetic: `Interior redesign of the same ${roomType || "room"}.
 
-IMPORTANT RULES:
-- Keep the same layout, walls, windows, and camera angle.
-- Do not modify architecture.
-- Remove watermark or text if present in the image.
+${baseRules}
 
-Transform the interior into aesthetic cozy style:
-stylish furniture, indoor plants, warm lighting, pastel walls, aesthetic wall art, textured rugs, cozy decor.
+STYLE TRANSFORMATION: AESTHETIC COZY
+- Soft, stylish furniture
+- Indoor plants and natural elements
+- Pastel or warm color palette
+- Textured fabrics, rugs, and wall art
+- Cozy ambient lighting (warm lamps, diffused light)
 
-Ultra-realistic aesthetic interior photography, instagram-style decor, soft lighting, photorealistic 4k render.`
+FINAL OUTPUT:
+Soft, cozy, Instagram-style aesthetic interior, warm lighting, dreamy atmosphere, ultra-realistic 4K render.`
   };
 
   return styles[style] || styles.modern;
