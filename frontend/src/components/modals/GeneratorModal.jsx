@@ -85,16 +85,13 @@ export default function GeneratorModal({ onClose }) {
       fd.append("style",        style || "");
       fd.append("roomType",     roomType || "");
       fd.append("customPrompt", customMode ? customPrompt : "");
-     const guestId = getGuestId();
+const guestId = getGuestId();
+fd.append("guestId", guestId);
 
 const data = await apiUpload(
   "/api/designs/generate",
   fd,
-  {
-    headers: {
-      "x-guest-id": guestId
-    }
-  }
+  "POST"
 );
       setResult(data.generatedImage);
       setOriginalUrl(data.originalImage);
@@ -114,16 +111,13 @@ const data = await apiUpload(
       const fd = new FormData();
       fd.append("image",        image);
       fd.append("instructions", enhanceInstr || "");
-     const guestId = getGuestId();
+const guestId = getGuestId();
+fd.append("guestId", guestId);
 
 const data = await apiUpload(
   "/api/designs/enhance",
   fd,
-  {
-    headers: {
-      "x-guest-id": guestId
-    }
-  }
+  "POST"
 );
       setResult(data.enhancedImage);
       setOriginalUrl(data.originalImage);
