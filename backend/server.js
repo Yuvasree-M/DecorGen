@@ -8,7 +8,7 @@ import designRoutes   from "./routes/designRoutes.js";
 import inquiryRoutes  from "./routes/inquiryRoutes.js";
 import contactRoutes  from "./routes/contactRoutes.js";
 import builderRoutes  from "./routes/builders.js";
-import  proxyImage  from    "./routes/proxyImage.js";
+
 const app = express();
 
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173", credentials: true }));
@@ -20,7 +20,7 @@ app.use("/api/designs",   designRoutes);
 app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/contact",   contactRoutes);
 app.use("/api/builders",  builderRoutes);
-app.get("/api/proxy-image", proxyImage);
+
 app.get("/", (_, res) => res.json({ message: "DecorGen API running ✅" }));
 
 app.use((err, req, res, next) => {
