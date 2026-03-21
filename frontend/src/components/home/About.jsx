@@ -3,16 +3,16 @@ import { FaBrain, FaMagic, FaPalette, FaUserTie } from "react-icons/fa";
 
 const slides = [
   {
-    before: "/bedroom.jpg",
-    after: "/bedroom_new.jpeg",
+    after: "/bedroom.jpg",
+    before: "/bedroom_new.jpeg",
   },
   {
-    before: "/oldroom.jpg",
-    after: "/living_room.jpeg",
+    after: "/oldroom.jpg",
+    before: "/living_room.jpeg",
   },
   {
-    before: "/kitchen.jpg",
-    after: "/new_kitchen.jpeg",
+    after: "/kitchen.jpg",
+    before: "/new_kitchen.jpeg",
   },
 ];
 

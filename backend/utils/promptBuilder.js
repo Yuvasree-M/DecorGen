@@ -1,82 +1,108 @@
 export const buildPrompt = ({ style, customPrompt, roomType }) => {
   const baseRules = `
-IMPORTANT STRICT RULES:
-- Preserve the EXACT original room layout, architecture, wall positions, windows, doors, and camera perspective.
-- DO NOT alter room structure, proportions, or viewpoint.
+CRITICAL INSTRUCTIONS (STRICTLY ENFORCED):
 
-RESTORATION & CLEANUP (MANDATORY):
-- Completely REMOVE all damage: cracks, stains, peeling paint, dampness, scratches, dirt, dust, clutter, or imperfections.
-- Replace ALL damaged, old, broken, or worn-out furniture and decor with brand-new, pristine items.
-- Surfaces must appear clean, polished, and flawless.
+STRUCTURE LOCK:
+- Preserve ONLY the room layout: walls, windows, doors, and camera angle.
+- DO NOT change geometry, proportions, or perspective.
+
+FULL RECONSTRUCTION (NOT ENHANCEMENT):
+- Completely rebuild the interior from scratch.
+- Treat the original image as a layout reference ONLY.
+- Ignore all original textures, materials, furniture, and surfaces.
+
+MANDATORY CLEAN REPLACEMENT:
+- Remove ALL damage: cracks, stains, mold, dirt, dust, scratches, peeling paint, rust.
+- Remove ALL old furniture, clutter, garbage, and broken items.
+- Replace EVERYTHING with brand-new, premium-quality elements.
+
+NEGATIVE CONSTRAINTS (STRICTLY FORBIDDEN):
+- No cracks, no dirt, no stains, no aging, no grunge.
+- No worn-out textures or damaged surfaces.
+- No old or reused furniture.
+
+SURFACE QUALITY:
+- Walls must be perfectly smooth and freshly painted.
+- Floors must be spotless (marble/wood/high-end tile).
+- Furniture must look new, sharp, and premium.
 
 LIGHTING (VERY IMPORTANT):
-- Apply realistic, high-quality lighting that MATCHES the target style.
-- Ensure proper brightness, soft shadows, natural/global illumination, and depth.
-- Eliminate dull, flat, or poorly lit areas. The room should feel professionally lit.
+- Bright, professional interior lighting.
+- Soft shadows, global illumination, natural highlights.
+- No dark, flat, or dull lighting.
 
 REALISM:
-- Use realistic materials (wood, marble, fabric, metal, glass).
-- Ensure proper reflections, shadows, depth, and spatial consistency.
-- Output should look like a high-end interior photoshoot.
+- Ultra photorealistic materials (wood, marble, fabric, glass, metal).
+- Correct reflections, shadows, and depth.
+- High-end interior photoshoot quality.
 
-- Remove any watermark, logo, or text overlay if present.
+FINAL GOAL:
+The result must look like a BRAND NEW luxury interior — not a repaired version of the old room.
 `;
 
   if (customPrompt?.trim()) {
-    return `Interior redesign of the same ${roomType || "room"}.
+    return `
+Interior redesign of the same ${roomType || "room"}.
 
 ${baseRules}
 
-Redesign the entire interior (ceiling to floor) including furniture, lighting, decor, flooring, walls, and ceiling using this description:
+CUSTOM STYLE INSTRUCTIONS:
 ${customPrompt}
 
 FINAL OUTPUT:
-Ultra-realistic interior design photography, high-end architectural visualization, perfectly clean and refined space, 4K photorealistic render, magazine-quality.`;
+Ultra-realistic luxury interior, perfectly clean, 4K photorealistic render, magazine-quality, sharp details, professional lighting.
+`;
   }
 
   const styles = {
-    modern: `Interior redesign of the same ${roomType || "room"}.
+    modern: `
+Interior redesign of the same ${roomType || "room"}.
 
 ${baseRules}
 
-STYLE TRANSFORMATION: MODERN LUXURY
-- Minimalist, clutter-free design
-- Sleek premium furniture
-- Glass, marble, or metal finishes
-- Neutral color palette (white, beige, grey, black)
-- Hidden LED ceiling lighting, ambient strip lighting
-- Clean lines and sophisticated decor
+STYLE: MODERN LUXURY
+- Minimalist, clutter-free layout
+- Sleek premium furniture with clean lines
+- Materials: glass, marble, metal, polished wood
+- Neutral palette: white, beige, grey, black
+- Hidden LED ceiling lights, ambient strip lighting
+- Large open feeling, elegant simplicity
 
 FINAL OUTPUT:
-Bright, well-lit modern luxury interior, ultra-realistic, soft shadows, premium materials, 4K architectural render.`,
+Bright modern luxury interior, ultra-clean, soft shadows, high-end materials, 4K architectural visualization, magazine-quality.
+`,
 
-    traditional: `Interior redesign of the same ${roomType || "room"}.
+    traditional: `
+Interior redesign of the same ${roomType || "room"}.
 
 ${baseRules}
 
-STYLE TRANSFORMATION: CLASSIC TRADITIONAL
-- Rich wooden furniture with fine craftsmanship
-- Ornate details, carved elements
-- Chandeliers, warm ambient lighting
-- Warm wall tones (cream, gold, brown)
-- Elegant curtains, rugs, and classic decor
+STYLE: CLASSIC TRADITIONAL
+- Rich wooden furniture with carved details
+- Ornate decor and elegant craftsmanship
+- Warm tones: cream, gold, brown, beige
+- Chandeliers and warm ambient lighting
+- Decorative curtains, rugs, classic wall art
 
 FINAL OUTPUT:
-Warm, inviting traditional interior, cinematic lighting, rich textures, ultra-realistic 4K render.`,
+Warm, elegant traditional interior, cinematic lighting, rich textures, ultra-realistic 4K render, timeless luxury feel.
+`,
 
-    aesthetic: `Interior redesign of the same ${roomType || "room"}.
+    aesthetic: `
+Interior redesign of the same ${roomType || "room"}.
 
 ${baseRules}
 
-STYLE TRANSFORMATION: AESTHETIC COZY
-- Soft, stylish furniture
-- Indoor plants and natural elements
-- Pastel or warm color palette
-- Textured fabrics, rugs, and wall art
-- Cozy ambient lighting (warm lamps, diffused light)
+STYLE: AESTHETIC COZY
+- Soft, modern furniture with rounded edges
+- Indoor plants and natural decor elements
+- Warm/pastel tones (beige, peach, soft green, off-white)
+- Textured fabrics, rugs, wall art
+- Cozy lighting: warm lamps, diffused glow, ambient lighting
 
 FINAL OUTPUT:
-Soft, cozy, Instagram-style aesthetic interior, warm lighting, dreamy atmosphere, ultra-realistic 4K render.`
+Cozy Instagram-style interior, warm dreamy lighting, soft shadows, ultra-realistic 4K render, clean and stylish aesthetic.
+`
   };
 
   return styles[style] || styles.modern;
