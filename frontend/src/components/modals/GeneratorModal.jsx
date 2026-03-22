@@ -509,23 +509,41 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
 
   const switchToEnhance = async () => {
     setTab("enhance");
+  
     if (result) {
-      setLoadingSwitch(true);
-      try {
-        const file = await urlToFile(result);
-        setImage(file);
-        setPreview(result);
-        setResult(null);
-        setOriginalUrl(null);
-        toast.info("AI design loaded — add enhancement instructions below.");
-      } catch {
-        toast.info("Switch to Enhance tab and upload your image.");
-      } finally {
-        setLoadingSwitch(false);
-      }
+      setPreview(result);
+      setImage(result);   // use URL directly
+      toast.info("Add instructions and click Enhance");
     }
   };
 
+  // const switchToEnhance = async () => {
+  //   setTab("enhance");
+  
+  //   setTimeout(() => {
+  //     document.querySelector("textarea")?.focus();
+  //   }, 100);
+  //   if (result) {
+  //     setLoadingSwitch(true);
+  
+  //     try {
+  //       const file = await urlToFile(result);
+  
+  //       setImage(file);
+  //       setPreview(result);
+  
+  //       // ❌ remove these two lines
+  //       // setResult(null);
+  //       // setOriginalUrl(null);
+  
+  //       toast.info("Add instructions and click Enhance");
+  //     } catch {
+  //       toast.info("Switch to Enhance tab and upload your image.");
+  //     } finally {
+  //       setLoadingSwitch(false);
+  //     }
+  //   }
+  // };
   const handleGenerate = async () => {
     if (!image) { toast.error("Please upload a room photo first"); return; }
     if (!style && !customMode) { toast.error("Please choose a design style"); return; }
@@ -554,7 +572,11 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
     setLoading(true);
     try {
       const fd = new FormData();
-      fd.append("image",        image);
+      if (typeof image === "string") {
+        fd.append("imageUrl", image);
+      } else {
+        fd.append("image", image);
+      }
       fd.append("instructions", enhanceInstr || "");
       fd.append("guestId",      getGuestId());
       const data = await apiUpload("/api/designs/enhance", fd, "POST");
@@ -584,7 +606,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-700 rounded-lg flex items-center justify-center text-white">
-                <FaMagic size={14} />
+              <FaMagic size={14} className="text-white" />
               </div>
               <div>
                 <h2 className="text-base font-bold text-gray-900 leading-none">AI Room Designer</h2>
@@ -655,7 +677,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                     </div>
                   ) : (
                     <div className="py-10 flex flex-col items-center gap-3 text-gray-400">
-                      <FaUpload size={30} />
+                    <FaUpload size={30} className="text-violet-500" />
                       <div className="text-center">
                         <p className="text-sm font-medium text-gray-600">Drop photo here or click to upload</p>
                         <p className="text-xs text-gray-400 mt-0.5">PNG, JPG, JPEG — up to 5 MB</p>
@@ -704,7 +726,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                       className={`mt-2 w-full py-2.5 rounded-xl border-2 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
                         customMode ? "border-violet-500 bg-violet-50 text-violet-700" : "border-gray-200 text-gray-500 hover:border-violet-300"
                       }`}>
-                      <FaMagic size={12} /> Custom Prompt {customMode ? "(Active)" : ""}
+                     <FaMagic size={12} className="text-white" /> Custom Prompt {customMode ? "(Active)" : ""}
                     </button>
                     {customMode && (
                       <textarea value={customPrompt} onChange={e => setCustomPrompt(e.target.value)} rows={3}
@@ -749,9 +771,9 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                     {tab === "generate" ? "Generating (10–20s)..." : "Enhancing (20–40s)..."}
                   </>
                 ) : tab === "generate" ? (
-                  <><FaStar size={14} /> Generate AI Design</>
+                  <><FaStar size={10} className="text-white-600" /> Generate AI Design</>
                 ) : (
-                  <><FaMagic size={13} /> Apply Enhancement</>
+                  <><FaMagic size={14} className="text-white" /> Apply Enhancement</>
                 )}
               </button>
             </div>
@@ -765,7 +787,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                       {tab === "generate" ? "Your AI Design" : "Enhanced Result"}
                     </h3>
                     <span className="text-[10px] bg-green-100 text-green-700 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <FaStar size={10} /> Ready
+                    <FaStar size={10} className="text-green-600" /> Ready
                     </span>
                   </div>
 
@@ -820,7 +842,7 @@ export default function GeneratorModal({ onClose, onNavigateToAuth }) {
                   <div className="grid grid-cols-2 gap-2.5">
                     <button onClick={switchToEnhance} disabled={loadingSwitch}
                       className="flex items-center justify-center gap-1.5 py-2.5 bg-amber-50 border border-amber-200 hover:border-amber-400 text-amber-700 rounded-xl text-xs font-semibold transition disabled:opacity-50">
-                      {loadingSwitch ? <AiOutlineLoading3Quarters size={13} className="animate-spin" /> : <FaMagic size={13} />} Enhance Further
+                      {loadingSwitch ? <FaSpinner size={13} className="animate-spin text-amber-600" />:<FaMagic size={14} className="text-white" />} Enhance Further
                     </button>
                     <button onClick={tab === "generate" ? handleGenerate : handleEnhance} disabled={loading}
                       className="flex items-center justify-center gap-1.5 py-2.5 border border-gray-200 text-gray-500 hover:text-violet-600 hover:border-violet-300 rounded-xl text-xs font-semibold transition disabled:opacity-40">

@@ -76,49 +76,128 @@ export const generateDesign = async (req, res) => {
 };
 
 // POST /api/designs/enhance
+// export const enhanceDesign = async (req, res) => {
+//   try {
+//     const file             = req.file;
+//     const { instructions } = req.body;
+//     const isGuest          = !req.user;
+//     if (!file) return res.status(400).json({ message: "Image required" });
+
+//     if (isGuest) {
+//       const identity = {
+//   userId: req.user?.uid,
+//   guestId: req.headers["x-guest-id"],
+//   ip: req.ip || "unknown",
+// };
+//       const check = checkGuestLimit(identity, "enhance");
+//       if (!check.allowed)
+//         return res.status(403).json({ message: `Free limit reached (${check.limit}). Please sign in.`, requireLogin: true });
+//       incrementGuestUsage(identity, "enhance");
+//     }
+
+//     const uploaded    = await uploadToCloudinary(file.buffer);
+//     const imageUrl    = uploaded.secure_url;
+//     const prompt      = `This is an interior design image. Keep the same room layout. Apply: ${instructions || "enhance lighting, colors and aesthetics"}. Realistic interior photography.`;
+//     const outputImage = await generateRoomDesign(prompt, imageUrl);
+
+//     if (req.user) {
+//       await db.collection("designs").add({
+//         userId: req.user.uid, originalImageUrl: imageUrl, generatedImageUrl: outputImage,
+//         enhanceInstructions: instructions || "", type: "enhance", createdAt: new Date(),
+//       });
+//     }
+// const identity = {
+//   userId: req.user?.uid,
+//   guestId: req.headers["x-guest-id"],
+//   ip: req.ip || "unknown",
+// };
+//     const remaining = isGuest ? checkGuestLimit(identity, "enhance").remaining : null;
+//     res.json({ success: true, originalImage: imageUrl, enhancedImage: outputImage, isGuest, remaining });
+//   } catch (err) {
+//     console.error("enhanceDesign error:", err.message);
+//     res.status(500).json({ message: "Enhancement failed" });
+//   }
+// };
 export const enhanceDesign = async (req, res) => {
   try {
-    const file             = req.file;
-    const { instructions } = req.body;
-    const isGuest          = !req.user;
-    if (!file) return res.status(400).json({ message: "Image required" });
+    const file = req.file;
+    const { instructions, imageUrl: bodyImageUrl } = req.body;
+    const isGuest = !req.user;
+
+    // ✅ accept file OR URL
+    if (!file && !bodyImageUrl) {
+      return res.status(400).json({ message: "Image required" });
+    }
 
     if (isGuest) {
       const identity = {
-  userId: req.user?.uid,
-  guestId: req.headers["x-guest-id"],
-  ip: req.ip || "unknown",
-};
+        userId: req.user?.uid,
+        guestId: req.headers["x-guest-id"],
+        ip: req.ip || "unknown",
+      };
+
       const check = checkGuestLimit(identity, "enhance");
-      if (!check.allowed)
-        return res.status(403).json({ message: `Free limit reached (${check.limit}). Please sign in.`, requireLogin: true });
+
+      if (!check.allowed) {
+        return res.status(403).json({
+          message: `Free limit reached (${check.limit}). Please sign in.`,
+          requireLogin: true
+        });
+      }
+
       incrementGuestUsage(identity, "enhance");
     }
 
-    const uploaded    = await uploadToCloudinary(file.buffer);
-    const imageUrl    = uploaded.secure_url;
-    const prompt      = `This is an interior design image. Keep the same room layout. Apply: ${instructions || "enhance lighting, colors and aesthetics"}. Realistic interior photography.`;
+    // ✅ use uploaded file OR existing URL
+    let imageUrl;
+
+    if (file) {
+      const uploaded = await uploadToCloudinary(file.buffer);
+      imageUrl = uploaded.secure_url;
+    } else {
+      imageUrl = bodyImageUrl;
+    }
+
+    const prompt = `This is an interior design image. Keep the same room layout. Apply: ${
+      instructions || "enhance lighting, colors and aesthetics"
+    }. Realistic interior photography.`;
+
     const outputImage = await generateRoomDesign(prompt, imageUrl);
 
     if (req.user) {
       await db.collection("designs").add({
-        userId: req.user.uid, originalImageUrl: imageUrl, generatedImageUrl: outputImage,
-        enhanceInstructions: instructions || "", type: "enhance", createdAt: new Date(),
+        userId: req.user.uid,
+        originalImageUrl: imageUrl,
+        generatedImageUrl: outputImage,
+        enhanceInstructions: instructions || "",
+        type: "enhance",
+        createdAt: new Date(),
       });
     }
-const identity = {
-  userId: req.user?.uid,
-  guestId: req.headers["x-guest-id"],
-  ip: req.ip || "unknown",
-};
-    const remaining = isGuest ? checkGuestLimit(identity, "enhance").remaining : null;
-    res.json({ success: true, originalImage: imageUrl, enhancedImage: outputImage, isGuest, remaining });
+
+    const identity = {
+      userId: req.user?.uid,
+      guestId: req.headers["x-guest-id"],
+      ip: req.ip || "unknown",
+    };
+
+    const remaining = isGuest
+      ? checkGuestLimit(identity, "enhance").remaining
+      : null;
+
+    res.json({
+      success: true,
+      originalImage: imageUrl,
+      enhancedImage: outputImage,
+      isGuest,
+      remaining
+    });
+
   } catch (err) {
     console.error("enhanceDesign error:", err.message);
     res.status(500).json({ message: "Enhancement failed" });
   }
 };
-
 // GET /api/designs/my  — simple .get() then JS sort, no index needed
 export const getMyDesigns = async (req, res) => {
   try {
