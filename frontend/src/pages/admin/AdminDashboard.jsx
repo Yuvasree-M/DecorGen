@@ -233,7 +233,7 @@ export default function AdminDashboard() {
                     <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
                       <table className="min-w-full bg-white">
                         <thead className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-gray-200">
-                          <tr>{["User","Email","Designs","Preview","Action"].map(h=><th key={h} className={TH}>{h}</th>)}</tr>
+                          <tr>{["User","Email","Designs","Action"].map(h=><th key={h} className={TH}>{h}</th>)}</tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                           {designGrps.map(g=>(
@@ -241,14 +241,7 @@ export default function AdminDashboard() {
                               <td className={`${TD} font-semibold text-gray-900`}>{g.userName}</td>
                               <td className={`${TD} text-gray-500 text-xs`}>{g.userEmail||"—"}</td>
                               <td className={TD}><span className="text-xs font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">{g.designCount}</span></td>
-                              <td className={TD}>
-                                <div className="flex gap-1 items-center">
-                                  {g.designs.slice(0,3).map(d=>(
-                                    <Img key={d.id} src={d.generatedImageUrl} alt="" cls="w-9 h-9 object-cover rounded-lg border border-gray-200"/>
-                                  ))}
-                                  {g.designCount>3&&<span className="w-9 h-9 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center text-xs text-gray-500 font-bold">+{g.designCount-3}</span>}
-                                </div>
-                              </td>
+                       
                               <td className={TD}>
                                 <button onClick={()=>setViewUser(g)}
                                   className="text-xs bg-purple-100 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 px-3 py-1.5 rounded-xl transition font-semibold">

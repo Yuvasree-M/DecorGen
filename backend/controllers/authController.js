@@ -10,7 +10,13 @@ export const register = async (req, res) => {
     const existing = await userRef.get();
 
     if (existing.exists) {
-      return res.json({ message: "User already exists" });
+      await userRef.update({
+        name: name || "",
+        phone: phone || ""
+      });
+
+      const updated = await userRef.get();
+      return res.json({ id: uid, ...updated.data() });
     }
 
     const newUser = {

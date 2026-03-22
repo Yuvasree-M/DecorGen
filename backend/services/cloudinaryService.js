@@ -1,4 +1,4 @@
-import cloudinary  from "../config/cloudinary.js";
+import cloudinary from "../config/cloudinary.js";
 import streamifier from "streamifier";
 
 const uploadBuffer = (buffer, folder) =>
@@ -10,6 +10,18 @@ const uploadBuffer = (buffer, folder) =>
     streamifier.createReadStream(buffer).pipe(stream);
   });
 
-export const uploadToCloudinary   = (buf) => uploadBuffer(buf, "interior-ai");
-export const uploadPortfolioImage = (buf) => uploadBuffer(buf, "interior-ai/portfolio");
-export const deleteFromCloudinary = (publicId) => cloudinary.uploader.destroy(publicId);
+const uploadUrl = (url, folder) =>
+  cloudinary.uploader.upload(url, { folder });
+
+export const uploadToCloudinary = (file) => {
+  if (typeof file === "string") {
+    return uploadUrl(file, "interior-ai");
+  }
+  return uploadBuffer(file, "interior-ai");
+};
+
+export const uploadPortfolioImage = (buf) =>
+  uploadBuffer(buf, "interior-ai/portfolio");
+
+export const deleteFromCloudinary = (publicId) =>
+  cloudinary.uploader.destroy(publicId);

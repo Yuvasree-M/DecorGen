@@ -249,50 +249,75 @@ export default function UserDashboard() {
             <>
               {/* ── Designs grid ── */}
               {tab === "designs" && (
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-                  {designs.map(d => (
-                    <div key={d.id}
-                      className="bg-white border border-gray-200 rounded-2xl overflow-hidden group hover:border-purple-300 hover:shadow-lg hover:shadow-purple-100 transition">
-                      <div className="aspect-[4/3] overflow-hidden bg-gray-100">
-                        <Img src={d.generatedImageUrl} alt={d.style || "design"}
-                          className="w-full h-full object-cover group-hover:scale-105 transition duration-500"/>
-                      </div>
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-bold text-gray-900 capitalize">
-                            {d.type === "enhance" ? "Enhanced" : d.style || "Custom"}
-                          </span>
-                          {d.roomType && (
-                            <span className="text-xs bg-purple-100 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-full capitalize">
-                              {d.roomType}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-400">{fmtDate(d.createdAt)}</p>
-                        <a href={d.generatedImageUrl} download target="_blank" rel="noopener noreferrer"
-                          className="mt-3 block text-center text-xs bg-gray-100 hover:bg-purple-600 hover:text-white border border-gray-200 text-gray-700 py-2 rounded-lg font-semibold transition">
-                          ↓ Download
-                        </a>
-                      </div>
-                    </div>
-                  ))}
+  <div className="space-y-3">
 
-                  {/* New design CTA card */}
-                  <button onClick={() => setShowGen(true)}
-                    className="bg-white border-2 border-dashed border-gray-300 hover:border-purple-400 hover:bg-purple-50 rounded-2xl flex flex-col items-center justify-center gap-2 transition group min-h-[220px]">
-                    <span className="text-4xl text-gray-300 group-hover:text-purple-500 transition">+</span>
-                    <span className="text-sm font-semibold text-gray-400 group-hover:text-purple-600 transition">New Design</span>
-                  </button>
+    {designs.map((d, i) => (
+      <div
+        key={d.id}
+        className="bg-white border border-gray-200 rounded-xl px-5 py-4 hover:border-purple-400 transition flex items-center justify-between"
+      >
+        <div className="flex items-center gap-4">
 
-                  {designs.length === 0 && (
-                    <div className="col-span-full text-center py-14 text-gray-400">
-                      <div className="text-5xl mb-3">✨</div>
-                      <p className="text-sm">No designs yet — create your first one!</p>
-                    </div>
-                  )}
-                </div>
+          {/* timeline dot */}
+          <div className="flex flex-col items-center">
+            <div className="w-2.5 h-2.5 bg-purple-500 rounded-full" />
+            {i !== designs.length - 1 && (
+              <div className="w-px h-10 bg-gray-200" />
+            )}
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+
+              <span className="font-semibold text-gray-900 capitalize">
+                {d.roomType || "Room"}
+              </span>
+
+              {d.style && (
+                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full capitalize">
+                  {d.style}
+                </span>
               )}
 
+              {d.type === "enhance" && (
+                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                  enhanced
+                </span>
+              )}
+            </div>
+
+            <p className="text-xs text-gray-400 mt-1">
+              {fmtDate(d.createdAt)}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+
+          <a
+            href={d.generatedImageUrl}
+            target="_blank"
+            className="text-xs text-gray-500 hover:text-purple-600 font-medium"
+          >
+            Download
+          </a>
+
+          <span className="text-purple-600 font-semibold text-sm">
+            View →
+          </span>
+
+        </div>
+      </div>
+    ))}
+
+    {designs.length === 0 && (
+      <div className="text-center py-16 text-gray-400">
+        No designs yet
+      </div>
+    )}
+
+  </div>
+)}
               {/* ── Inquiries / Chats ── */}
               {tab === "inquiries" && (
                 <div className="space-y-4">

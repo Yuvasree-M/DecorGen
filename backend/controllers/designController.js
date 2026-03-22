@@ -42,7 +42,12 @@ export const generateDesign = async (req, res) => {
     const uploaded    = await uploadToCloudinary(file.buffer);
     const imageUrl    = uploaded.secure_url;
     const prompt      = buildPrompt({ style, customPrompt, roomType });
-    const outputImage = await generateRoomDesign(prompt, imageUrl);
+    const tempOutput = await generateRoomDesign(prompt, imageUrl);
+
+// upload AI result to cloudinary (permanent)
+const uploadedOutput = await uploadToCloudinary(tempOutput);
+
+const outputImage = uploadedOutput.secure_url;
 
     if (req.user) {
       await db.collection("designs").add({
@@ -162,7 +167,12 @@ export const enhanceDesign = async (req, res) => {
       instructions || "enhance lighting, colors and aesthetics"
     }. Realistic interior photography.`;
 
-    const outputImage = await generateRoomDesign(prompt, imageUrl);
+    const tempOutput = await generateRoomDesign(prompt, imageUrl);
+
+    // upload AI result to cloudinary (permanent)
+    const uploadedOutput = await uploadToCloudinary(tempOutput);
+    
+    const outputImage = uploadedOutput.secure_url;
 
     if (req.user) {
       await db.collection("designs").add({
