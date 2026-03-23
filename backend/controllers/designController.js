@@ -42,12 +42,8 @@ export const generateDesign = async (req, res) => {
     const uploaded    = await uploadToCloudinary(file.buffer);
     const imageUrl    = uploaded.secure_url;
     const prompt      = buildPrompt({ style, customPrompt, roomType });
-    const tempOutput = await generateRoomDesign(prompt, imageUrl);
+const outputImage = await generateRoomDesign(prompt, imageUrl);
 
-// upload AI result to cloudinary (permanent)
-const uploadedOutput = await uploadToCloudinary(tempOutput);
-
-const outputImage = uploadedOutput.secure_url;
 
     if (req.user) {
       await db.collection("designs").add({
@@ -166,13 +162,7 @@ export const enhanceDesign = async (req, res) => {
     const prompt = `This is an interior design image. Keep the same room layout. Apply: ${
       instructions || "enhance lighting, colors and aesthetics"
     }. Realistic interior photography.`;
-
-    const tempOutput = await generateRoomDesign(prompt, imageUrl);
-
-    // upload AI result to cloudinary (permanent)
-    const uploadedOutput = await uploadToCloudinary(tempOutput);
-    
-    const outputImage = uploadedOutput.secure_url;
+const outputImage = await generateRoomDesign(prompt, imageUrl);
 
     if (req.user) {
       await db.collection("designs").add({
