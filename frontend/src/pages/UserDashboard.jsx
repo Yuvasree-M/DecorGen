@@ -792,9 +792,22 @@ function DesignViewModal({ design, onClose, onDelete, fmtDate }) {
               🗑️ Delete from History
             </button>
             {hasGenerated && (
-              <a href={design.generatedImageUrl} target="_blank" rel="noreferrer" className="ud-btn-dload-lg">
+              <button className="ud-btn-dload-lg" onClick={async () => {
+                try {
+                  const res = await fetch(design.generatedImageUrl);
+                  const blob = await res.blob();
+                  const blobUrl = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = blobUrl;
+                  a.download = "decorgen-design.jpg";
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(blobUrl);
+                } catch { window.open(design.generatedImageUrl, "_blank"); }
+              }}>
                 ↓ Download Design
-              </a>
+              </button>
             )}
           </div>
         </div>
@@ -1030,7 +1043,18 @@ export default function UserDashboard() {
 
                           <div className="ud-design-actions">
                             {d.generatedImageUrl && (
-                              <a href={d.generatedImageUrl} target="_blank" rel="noreferrer" className="ud-btn-dload">↓</a>
+                             <button className="ud-btn-dload" onClick={async () => {
+                              try {
+                                const res = await fetch(d.generatedImageUrl);
+                                const blob = await res.blob();
+                                const blobUrl = URL.createObjectURL(blob);
+                                const a = document.createElement("a");
+                                a.href = blobUrl; a.download = "decorgen-design.jpg";
+                                document.body.appendChild(a); a.click();
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(blobUrl);
+                              } catch { window.open(d.generatedImageUrl, "_blank"); }
+                            }}>↓</button>
                             )}
                             <button className="ud-btn-view" onClick={() => setViewDesign(d)}>View →</button>
                             <button className="ud-btn-delete"

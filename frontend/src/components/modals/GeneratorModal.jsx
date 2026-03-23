@@ -449,14 +449,21 @@ function GuestLimitPopup({ onClose, onSignIn, onSignUp }) {
 // ── Download Format Picker ────────────────────────────────────────────────────
 function DownloadPicker({ url, onClose }) {
   const formats = ["jpg", "png", "jpeg"];
-  const download = (fmt) => {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `decorgen-design.${fmt}`;
-    a.target = "_blank";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const download = async (fmt) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = `decorgen-design.${fmt}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.open(url, "_blank");
+    }
     onClose();
   };
   return (
