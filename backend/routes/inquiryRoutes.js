@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   createInquiry, getMyInquiries, getBuilderInquiries,
-  getAllInquiries, sendMessage, updateInquiryStatus
+  getAllInquiries, sendMessage, updateInquiryStatus,  deleteInquiry
 } from "../controllers/inquiryController.js";
 import { verifyToken, optionalToken } from "../middleware/verifyToken.js";
 import { attachUser }                 from "../middleware/attachUser.js";
@@ -14,4 +14,6 @@ router.get("/builder",           verifyToken, attachUser, getBuilderInquiries);
 router.get("/all",               verifyToken, attachUser, checkAdmin, getAllInquiries);
 router.post("/:id/message",      verifyToken, attachUser, sendMessage);
 router.patch("/:id/status",      verifyToken, attachUser, updateInquiryStatus);
+router.delete("/:id", verifyToken, attachUser, deleteInquiry);
+
 export default router;

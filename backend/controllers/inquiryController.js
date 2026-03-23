@@ -152,3 +152,23 @@ export const updateInquiryStatus = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// DELETE /api/inquiries/:id — user deletes their own chat
+export const deleteInquiry = async (req, res) => {
+  try {
+    const ref  = db.collection("inquiries").doc(req.params.id);
+    const snap = await ref.get();
+
+    if (!snap.exists)
+      return res.status(404).json({ message: "Inquiry not found" });
+
+    if (snap.data().userId !== req.user.uid)
+      return res.status(403).json({ message: "Forbidden" });
+
+    await ref.delete();
+    res.json({ success: true });
+  } catch (err) {
+    console.error("deleteInquiry error:", err.message);
+    res.status(500).json({ message: "Failed to delete inquiry" });
+  }
+};
