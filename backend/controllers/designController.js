@@ -234,3 +234,25 @@ export const getAllDesigns = async (req, res) => {
 
 // PATCH /api/designs/:id/download
 export const recordDownload = async (req, res) => res.json({ success: true });
+// DELETE /api/designs/:id
+export const deleteDesign = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const docRef = db.collection("designs").doc(id);
+    const doc    = await docRef.get();
+
+    if (!doc.exists)
+      return res.status(404).json({ message: "Design not found" });
+
+    // only the owner can delete
+    if (doc.data().userId !== req.user.uid)
+      return res.status(403).json({ message: "Forbidden" });
+
+    await docRef.delete();
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("deleteDesign error:", err.message);
+    res.status(500).json({ message: "Failed to delete design" });
+  }
+};
