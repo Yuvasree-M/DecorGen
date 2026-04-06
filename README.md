@@ -4,7 +4,7 @@ Full-stack application: React + Vite frontend, Node.js + Express backend, Fireba
 
 ---
 
-## ✅ Architecture (Correct Flow)
+## Architecture (Correct Flow)
 
 ```
 Browser (React)
@@ -18,7 +18,7 @@ Browser (React)
 
 ---
 
-## 👥 User Roles
+##  User Roles
 
 | Role    | Access |
 |---------|--------|
@@ -30,7 +30,7 @@ Set roles in Admin Dashboard → Users tab → Change Role dropdown.
 
 ---
 
-## 🔗 Routes
+##  Routes
 
 | Path                  | Access |
 |-----------------------|--------|
@@ -43,7 +43,7 @@ Set roles in Admin Dashboard → Users tab → Change Role dropdown.
 
 ---
 
-## 🚀 Setup
+##  Setup
 
 ### 1. Firebase
 
@@ -109,7 +109,7 @@ Open **http://localhost:5173**
 
 ---
 
-## 📦 Features
+##  Features
 
 - **Hero section** — fullscreen room background, CTA button opens generator modal
 - **About section** — app description + image grid
@@ -127,7 +127,7 @@ Open **http://localhost:5173**
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 ```
 POST /api/auth/register          — register new user (after Firebase signup)
